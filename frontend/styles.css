@@ -1601,7 +1601,7 @@ body {
 /* ===== NOTIFICAÇÕES ===== */
 .notificacao {
     position: fixed;
-    top: 70px;
+    top: 120px;
     right: 20px;
     padding: 14px 20px;
     border-radius: var(--radius-sm);

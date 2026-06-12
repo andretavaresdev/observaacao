@@ -49,8 +49,10 @@ function selecionarCategoria(categoria) {
     categoriaSelecionada = categoria;
     document.querySelectorAll('.profile-btn').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.querySelector('[data-screen="denuncia"]').classList.add('active');
-    document.getElementById('screen-denuncia').classList.add('active');
+    document.querySelector('[data-screen="atendente"]').classList.add('active');
+    document.getElementById('screen-atendente').classList.add('active');
+    const selectCategoria = document.getElementById('atend-categoria');
+    if (selectCategoria) selectCategoria.value = categoria;
 }
 
 // ===== TELA 2: DENÚNCIA ANÔNIMA =====
