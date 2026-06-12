@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ObservAção — Cadastro</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        if (sessionStorage.getItem('usuario')) window.location.replace('/');
+    </script>
+</head>
+<body>
+    <div class="login-page">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo-icon">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <h1>Observ<span class="accent">Ação</span></h1>
+                <p class="login-subtitle">Criar nova conta</p>
+            </div>
+
+            <div class="login-perfis">
+                <div class="login-perfil-card" id="card-cidadao" onclick="selecionarPerfil('cidadao')">
+                    <div class="login-perfil-icon cidadao">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span class="login-perfil-nome">Cidadão</span>
+                    <small>Acompanhe solicitações</small>
+                </div>
+                <div class="login-perfil-card" id="card-atendente" onclick="selecionarPerfil('atendente')">
+                    <div class="login-perfil-icon atendente">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <span class="login-perfil-nome">Atendente</span>
+                    <small>Painel administrativo</small>
+                </div>
+            </div>
+
+            <form id="form-cadastro" class="login-form">
+                <div class="form-group" style="margin-bottom:0">
+                    <label>Nome completo</label>
+                    <input type="text" id="cad-nome" placeholder="Seu nome" autocomplete="off">
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label>Usuário</label>
+                    <input type="text" id="cad-login" placeholder="Nome de usuário para login" autocomplete="off">
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label>Senha</label>
+                    <div class="login-senha-wrapper">
+                        <input type="password" id="cad-senha" placeholder="Crie uma senha">
+                        <button type="button" class="btn-toggle-senha" onclick="toggleSenha('cad-senha', 'icon-senha1')">
+                            <i class="fas fa-eye" id="icon-senha1"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label>Confirmar senha</label>
+                    <div class="login-senha-wrapper">
+                        <input type="password" id="cad-confirmar" placeholder="Repita a senha">
+                        <button type="button" class="btn-toggle-senha" onclick="toggleSenha('cad-confirmar', 'icon-senha2')">
+                            <i class="fas fa-eye" id="icon-senha2"></i>
+                        </button>
+                    </div>
+                </div>
+                <p id="cad-erro" class="login-erro" style="display:none">
+                    <i class="fas fa-exclamation-circle"></i> <span id="cad-erro-msg">Erro ao criar conta.</span>
+                </p>
+                <p id="cad-sucesso" class="login-sucesso" style="display:none">
+                    <i class="fas fa-check-circle"></i> Conta criada! Redirecionando para o login...
+                </p>
+                <button type="submit" class="btn-primary btn-login">
+                    <i class="fas fa-user-plus"></i> Criar conta
+                </button>
+            </form>
+
+            <p class="login-cadastro-link">Já tem conta? <a href="/login.html">Entrar</a></p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+        let perfilSelecionado = null;
+
+        function selecionarPerfil(tipo) {
+            document.querySelectorAll('.login-perfil-card').forEach(c => c.classList.remove('selecionado'));
+            document.getElementById('card-' + tipo).classList.add('selecionado');
+            perfilSelecionado = tipo;
+        }
+
+        function toggleSenha(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+
+        document.getElementById('form-cadastro').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const nome = document.getElementById('cad-nome').value.trim();
+            const login = document.getElementById('cad-login').value.trim().toLowerCase();
+            const senha = document.getElementById('cad-senha').value;
+            const confirmar = document.getElementById('cad-confirmar').value;
+            const erroEl = document.getElementById('cad-erro');
+            const erroMsg = document.getElementById('cad-erro-msg');
+            const sucessoEl = document.getElementById('cad-sucesso');
+
+            erroEl.style.display = 'none';
+            sucessoEl.style.display = 'none';
+
+            if (!perfilSelecionado) {
+                erroMsg.textContent = 'Selecione um perfil (Cidadão ou Atendente).';
+                erroEl.style.display = 'flex';
+                return;
+            }
+            if (!nome || !login || !senha) {
+                erroMsg.textContent = 'Preencha todos os campos.';
+                erroEl.style.display = 'flex';
+                return;
+            }
+            if (senha !== confirmar) {
+                erroMsg.textContent = 'As senhas não coincidem.';
+                erroEl.style.display = 'flex';
+                return;
+            }
+
+            const tipo = perfilSelecionado === 'atendente' ? 'SERVIDOR' : 'CIDADAO';
+
+            try {
+                const res = await fetch(`${API_BASE}/usuarios`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome, tipo, anonimo: false, login, senha })
+                });
+                if (!res.ok) {
+                    const msg = await res.text();
+                    throw new Error(msg || 'Erro ao criar conta.');
+                }
+                sucessoEl.style.display = 'flex';
+                setTimeout(() => window.location.replace('/login.html'), 2000);
+            } catch (err) {
+                erroMsg.textContent = err.message || 'Erro ao criar conta.';
+                erroEl.style.display = 'flex';
+            }
+        });
+    </script>
+</body>
+</html>

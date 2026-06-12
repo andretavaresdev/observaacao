@@ -25,9 +25,9 @@ public class DataLoader {
 
     @PostConstruct
     public void carregarDados() {
-        UsuarioResponse joao = usuarioService.criar(new UsuarioRequest("João Miguel", "CIDADAO", false));
-        UsuarioResponse maria = usuarioService.criar(new UsuarioRequest("Maria Clara", "CIDADAO", false));
-        usuarioService.criar(new UsuarioRequest("Carlos Andrade", "SERVIDOR", false));
+        UsuarioResponse joao = usuarioService.criar(new UsuarioRequest("João Miguel", "CIDADAO", false, "cidadao", "123"));
+        UsuarioResponse maria = usuarioService.criar(new UsuarioRequest("Maria Clara", "CIDADAO", false, null, null));
+        usuarioService.criar(new UsuarioRequest("Carlos Andrade", "SERVIDOR", false, "atendente", "123"));
 
         SolicitacaoResponse s1 = solicitacaoService.criar(new SolicitacaoRequest(
                 "Poste apagado na Rua Genny Gomes há 3 semanas",

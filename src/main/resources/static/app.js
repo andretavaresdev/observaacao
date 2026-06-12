@@ -4,6 +4,31 @@ const API_BASE = 'http://localhost:8080/api';
 // ===== ESTADO GLOBAL =====
 let categoriaSelecionada = null;
 
+// ===== AUTENTICAÇÃO =====
+const usuarioLogado = JSON.parse(sessionStorage.getItem('usuario') || 'null');
+
+const ABAS_POR_TIPO = {
+    CIDADAO:  ['cidadao', 'denuncia', 'atendente'],
+    SERVIDOR: ['atendente', 'gestora', 'admin']
+};
+
+function configurarTabs(tipo) {
+    const abas = ABAS_POR_TIPO[tipo] || [];
+    const chave = tipo === 'CIDADAO' ? 'cidadao' : 'atendente';
+    document.querySelectorAll('.profile-btn').forEach(btn => {
+        const tipos = (btn.dataset.tipos || '').split(',');
+        btn.style.display = tipos.includes(chave) ? 'flex' : 'none';
+    });
+    const primeiroBtn = document.querySelector(`.profile-btn[data-screen="${abas[0]}"]`);
+    if (primeiroBtn) primeiroBtn.click();
+}
+
+function fazerLogout() {
+    sessionStorage.removeItem('usuario');
+    window.location.replace('/login.html');
+}
+
+
 // ===== NAVEGAÇÃO ENTRE TELAS =====
 document.querySelectorAll('.profile-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -325,13 +350,6 @@ function renderDashboardGestora(total, taxaResolucao, pendentes, porCategoria) {
                     <a href="#" class="nav-item" onclick="navGestora('gestora-equipes', this)"><i class="fas fa-users"></i> Equipes</a>
                     <a href="#" class="nav-item" onclick="navGestora('gestora-config', this)"><i class="fas fa-cog"></i> Configurações</a>
                 </nav>
-                <div class="sidebar-user">
-                    <div class="user-avatar"><i class="fas fa-user"></i></div>
-                    <div class="user-info">
-                        <span class="user-name">Ana Gestora</span>
-                        <span class="user-role">Gestora Municipal</span>
-                    </div>
-                </div>
             </aside>
             <main class="gestora-content">
                 <div id="gestora-dashboard" class="gestora-secao">
@@ -503,13 +521,6 @@ function renderPainelAdmin(totalSolicitacoes, totalUsuarios) {
                     <a href="#" class="nav-item" onclick="navAdmin('admin-config', this)"><i class="fas fa-cogs"></i> Configurações</a>
                     <a href="#" class="nav-item" onclick="navAdmin('admin-logs', this)"><i class="fas fa-file-code"></i> Logs</a>
                 </nav>
-                <div class="sidebar-user">
-                    <div class="user-avatar"><i class="fas fa-user-shield"></i></div>
-                    <div class="user-info">
-                        <span class="user-name">Carlos Admin</span>
-                        <span class="user-role">Administrador TI</span>
-                    </div>
-                </div>
             </aside>
             <main class="admin-content">
                 <div id="admin-monitoramento" class="admin-secao">
@@ -819,7 +830,12 @@ document.querySelector('#form-atendimento .btn-secondary')?.addEventListener('cl
 
 // ===== INICIALIZAÇÃO =====
 document.addEventListener('DOMContentLoaded', () => {
-    // Renderizar com dados demo para os jurados verem imediatamente
     renderDashboardGestora(DEMO_DATA.total, DEMO_DATA.taxaResolucao, DEMO_DATA.pendentes, DEMO_DATA.porCategoria);
     renderPainelAdmin(DEMO_DATA.total, 384);
+
+    // Configura menu e abas com o usuário da sessão
+    if (usuarioLogado) {
+        document.getElementById('profile-nav').style.display = 'flex';
+        configurarTabs(usuarioLogado.tipo);
+    }
 });

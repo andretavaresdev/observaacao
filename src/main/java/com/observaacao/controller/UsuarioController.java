@@ -1,5 +1,6 @@
 package com.observaacao.controller;
 
+import com.observaacao.dto.LoginRequest;
 import com.observaacao.dto.UsuarioRequest;
 import com.observaacao.dto.UsuarioResponse;
 import com.observaacao.service.UsuarioService;
@@ -38,5 +39,10 @@ public class UsuarioController {
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioResponse> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(usuarioService.buscarPorId(id));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UsuarioResponse> login(@RequestBody LoginRequest request) {
+        return ResponseEntity.ok(usuarioService.autenticar(request.login(), request.senha()));
     }
 }

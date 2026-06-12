@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ObservAção — Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        if (sessionStorage.getItem('usuario')) window.location.replace('/');
+    </script>
+</head>
+<body>
+    <div class="login-page">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo-icon">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <h1>Observ<span class="accent">Ação</span></h1>
+                <p class="login-subtitle">Plataforma de Gestão de Solicitações Públicas</p>
+            </div>
+
+            <div class="login-perfis">
+                <div class="login-perfil-card" id="card-cidadao" onclick="selecionarPerfil('cidadao')">
+                    <div class="login-perfil-icon cidadao">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span class="login-perfil-nome">Cidadão</span>
+                    <small>Acompanhe solicitações</small>
+                </div>
+                <div class="login-perfil-card" id="card-atendente" onclick="selecionarPerfil('atendente')">
+                    <div class="login-perfil-icon atendente">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <span class="login-perfil-nome">Atendente</span>
+                    <small>Painel administrativo</small>
+                </div>
+            </div>
+
+            <form id="form-login" class="login-form">
+                <div class="form-group" style="margin-bottom:0">
+                    <label>Usuário</label>
+                    <input type="text" id="login-usuario" placeholder="Ex: cidadao ou atendente" autocomplete="off">
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label>Senha</label>
+                    <div class="login-senha-wrapper">
+                        <input type="password" id="login-senha" placeholder="Digite sua senha">
+                        <button type="button" class="btn-toggle-senha" onclick="toggleSenha()">
+                            <i class="fas fa-eye" id="icon-senha"></i>
+                        </button>
+                    </div>
+                </div>
+                <p id="login-erro" class="login-erro" style="display:none">
+                    <i class="fas fa-exclamation-circle"></i> Usuário ou senha incorretos.
+                </p>
+                <button type="submit" class="btn-primary btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Entrar
+                </button>
+            </form>
+
+            <p class="login-cadastro-link">Não tem conta? <a href="/cadastro.html">Criar conta</a></p>
+
+            <div class="login-separator"><span>ou</span></div>
+
+            <button class="btn-denuncia-anonima" onclick="abrirModalDenuncia()">
+                <i class="fas fa-user-secret"></i> Fazer denúncia anônima
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Denúncia Anônima -->
+    <div id="modal-denuncia" class="modal-denuncia-overlay" onclick="fecharModalFora(event)">
+        <div class="modal-denuncia-card">
+            <button class="modal-fechar" onclick="fecharModal()"><i class="fas fa-times"></i></button>
+
+            <div class="modal-denuncia-header">
+                <div class="badge-anonimo-modal">
+                    <i class="fas fa-user-secret"></i> Modo Anônimo
+                </div>
+                <h2>Fazer Denúncia</h2>
+                <p>Sua identidade não será registrada.</p>
+            </div>
+
+            <form id="form-denuncia-modal">
+                <div class="form-group" style="margin-bottom:0">
+                    <label>Categoria</label>
+                    <div class="modal-categorias">
+                        <button type="button" class="modal-cat-btn" data-cat="ILUMINACAO" onclick="selecionarCategoria(this)">
+                            <i class="fas fa-lightbulb"></i> Iluminação
+                        </button>
+                        <button type="button" class="modal-cat-btn" data-cat="BURACO" onclick="selecionarCategoria(this)">
+                            <i class="fas fa-road"></i> Buracos
+                        </button>
+                        <button type="button" class="modal-cat-btn" data-cat="LIXO" onclick="selecionarCategoria(this)">
+                            <i class="fas fa-broom"></i> Limpeza
+                        </button>
+                        <button type="button" class="modal-cat-btn" data-cat="AGUA" onclick="selecionarCategoria(this)">
+                            <i class="fas fa-tint"></i> Água
+                        </button>
+                        <button type="button" class="modal-cat-btn" data-cat="ESGOTO" onclick="selecionarCategoria(this)">
+                            <i class="fas fa-exclamation-triangle"></i> Esgoto
+                        </button>
+                        <button type="button" class="modal-cat-btn" data-cat="OUTRO" onclick="selecionarCategoria(this)">
+                            <i class="fas fa-ellipsis-h"></i> Outro
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label>Descrição</label>
+                    <div class="textarea-wrapper">
+                        <textarea id="den-descricao" rows="3" maxlength="1000" placeholder="Descreva o que está acontecendo..."></textarea>
+                        <span class="char-count"><span id="den-chars">0</span> / 1000</span>
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom:0">
+                    <label>Endereço / Localização</label>
+                    <input type="text" id="den-endereco" placeholder="Rua, bairro ou referência...">
+                </div>
+                <p id="den-erro" class="login-erro" style="display:none">
+                    <i class="fas fa-exclamation-circle"></i> <span id="den-erro-msg">Preencha todos os campos.</span>
+                </p>
+                <p id="den-sucesso" class="login-sucesso" style="display:none">
+                    <i class="fas fa-check-circle"></i> Denúncia enviada com sucesso!
+                </p>
+                <button type="submit" class="btn-primary btn-login">
+                    <i class="fas fa-shield-alt"></i> Enviar denúncia anônima
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+
+        function selecionarPerfil(tipo) {
+            document.querySelectorAll('.login-perfil-card').forEach(c => c.classList.remove('selecionado'));
+            document.getElementById('card-' + tipo).classList.add('selecionado');
+            document.getElementById('login-usuario').value = tipo;
+            document.getElementById('login-senha').focus();
+        }
+
+        function toggleSenha() {
+            const input = document.getElementById('login-senha');
+            const icon = document.getElementById('icon-senha');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+
+        document.getElementById('form-login').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const login = document.getElementById('login-usuario').value.trim().toLowerCase();
+            const senha = document.getElementById('login-senha').value;
+            if (!login || !senha) return;
+
+            const erroEl = document.getElementById('login-erro');
+            erroEl.style.display = 'none';
+
+            try {
+                const res = await fetch(`${API_BASE}/usuarios/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ login, senha })
+                });
+                if (!res.ok) throw new Error('Credenciais inválidas');
+                const user = await res.json();
+                sessionStorage.setItem('usuario', JSON.stringify(user));
+                window.location.replace('/');
+            } catch (err) {
+                erroEl.style.display = 'flex';
+                setTimeout(() => erroEl.style.display = 'none', 3000);
+            }
+        });
+
+        // Modal denúncia
+        let categoriaSelecionada = null;
+
+        function abrirModalDenuncia() {
+            document.getElementById('modal-denuncia').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function fecharModal() {
+            document.getElementById('modal-denuncia').style.display = 'none';
+            document.body.style.overflow = '';
+            resetarModal();
+        }
+
+        function fecharModalFora(e) {
+            if (e.target === document.getElementById('modal-denuncia')) fecharModal();
+        }
+
+        function resetarModal() {
+            categoriaSelecionada = null;
+            document.querySelectorAll('.modal-cat-btn').forEach(b => b.classList.remove('ativo'));
+            document.getElementById('den-descricao').value = '';
+            document.getElementById('den-endereco').value = '';
+            document.getElementById('den-chars').textContent = '0';
+            document.getElementById('den-erro').style.display = 'none';
+            document.getElementById('den-sucesso').style.display = 'none';
+        }
+
+        function selecionarCategoria(btn) {
+            document.querySelectorAll('.modal-cat-btn').forEach(b => b.classList.remove('ativo'));
+            btn.classList.add('ativo');
+            categoriaSelecionada = btn.dataset.cat;
+        }
+
+        document.getElementById('den-descricao').addEventListener('input', function () {
+            document.getElementById('den-chars').textContent = this.value.length;
+        });
+
+        document.getElementById('form-denuncia-modal').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const descricao = document.getElementById('den-descricao').value.trim();
+            const endereco = document.getElementById('den-endereco').value.trim();
+            const erroEl = document.getElementById('den-erro');
+            const erroMsg = document.getElementById('den-erro-msg');
+            const sucessoEl = document.getElementById('den-sucesso');
+
+            erroEl.style.display = 'none';
+            sucessoEl.style.display = 'none';
+
+            if (!categoriaSelecionada) {
+                erroMsg.textContent = 'Selecione uma categoria.';
+                erroEl.style.display = 'flex';
+                return;
+            }
+            if (!descricao || !endereco) {
+                erroMsg.textContent = 'Preencha a descrição e o endereço.';
+                erroEl.style.display = 'flex';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/solicitacoes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ descricao, categoria: categoriaSelecionada, endereco, usuarioId: null, anonimo: true })
+                });
+                if (!res.ok) throw new Error();
+                sucessoEl.style.display = 'flex';
+                setTimeout(() => fecharModal(), 2500);
+            } catch {
+                erroMsg.textContent = 'Erro ao enviar. Tente novamente.';
+                erroEl.style.display = 'flex';
+            }
+        });
+    </script>
+</body>
+</html>

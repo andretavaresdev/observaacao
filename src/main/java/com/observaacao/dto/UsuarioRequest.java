@@ -6,5 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 public record UsuarioRequest(
         @NotBlank(message = "Nome é obrigatório") String nome,
         @NotBlank(message = "Tipo é obrigatório") String tipo,
-        boolean anonimo
+        boolean anonimo,
+        String login,
+        String senha
 ) {}

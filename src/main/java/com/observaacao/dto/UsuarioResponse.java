@@ -6,9 +6,10 @@ public record UsuarioResponse(
         Long id,
         String nome,
         String tipo,
-        boolean anonimo
+        boolean anonimo,
+        String login
 ) {
     public static UsuarioResponse de(Usuario u) {
-        return new UsuarioResponse(u.getId(), u.getNome(), u.getTipo(), u.isAnonimo());
+        return new UsuarioResponse(u.getId(), u.getNome(), u.getTipo(), u.isAnonimo(), u.getLogin());
     }
 }

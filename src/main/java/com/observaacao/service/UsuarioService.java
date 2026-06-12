@@ -22,8 +22,15 @@ public class UsuarioService {
 
     public UsuarioResponse criar(UsuarioRequest request) {
         validarTipo(request.tipo());
-        Usuario usuario = new Usuario(request.nome(), request.tipo().toUpperCase(), request.anonimo());
+        Usuario usuario = new Usuario(request.nome(), request.tipo().toUpperCase(), request.anonimo(), request.login(), request.senha());
         return UsuarioResponse.de(usuarioRepository.save(usuario));
+    }
+
+    @Transactional(readOnly = true)
+    public UsuarioResponse autenticar(String login, String senha) {
+        return usuarioRepository.findByLoginAndSenha(login, senha)
+                .map(UsuarioResponse::de)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário ou senha incorretos"));
     }
 
     @Transactional(readOnly = true)
